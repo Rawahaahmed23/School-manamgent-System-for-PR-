@@ -1,4 +1,4 @@
-import React, { useState, useRef,useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { FaUser, FaLock } from "react-icons/fa";
 import Input from '../components/Input';
 import { useAuth } from '@/Store/useAuth';
@@ -15,11 +15,7 @@ export default function LoginForm() {
   const [Loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const {userAuthentication} = useAuth()
-
-
-
-
+  const { userAuthentication } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +43,7 @@ export default function LoginForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Invalid credentials");
+        setError(data.extraDetails || data.message);
         setLoading(false);
         return;
       }
@@ -73,11 +69,9 @@ export default function LoginForm() {
         />
       </div>
 
-   
       <div className="flex-1 bg-white flex items-center justify-center p-8 lg:p-12 relative shadow-2xl">
         <div className="w-full max-w-md">
 
-      
           <div className="mb-10">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
               Login
@@ -97,7 +91,6 @@ export default function LoginForm() {
             </a>
           </p>
 
-         
           <form onSubmit={handleSubmit} className="space-y-6">
 
             {error && (
@@ -124,7 +117,6 @@ export default function LoginForm() {
               icon={<FaLock />}
             />
 
-   
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                 <input
@@ -135,6 +127,14 @@ export default function LoginForm() {
                 />
                 Remember Me
               </label>
+
+              {/* ── Forgot Password Link ── */}
+              <a
+                href="/forgot-password"
+                className="text-sm text-sky-500 font-semibold hover:text-sky-600 transition-colors"
+              >
+                Forgot Password?
+              </a>
             </div>
 
             <button

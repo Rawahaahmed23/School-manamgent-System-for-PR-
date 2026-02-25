@@ -9,17 +9,18 @@ import Dashboard from './pages/Dashboard';
 import FeesTracker from './pages/FeesTracker';
 import { AuthProvider } from './Store/useAuth';      
 import ProtectedRoute from './components/Protectiveroute';
+import ForgotPassword from './pages/ForgotPass';
+
+import ResetPassword from './pages/ResetPassword';
 function App() {
   return (
     <AuthProvider>   
     <BrowserRouter>
   <Routes>
 
-    {/* Public Routes */}
     <Route path="/register" element={<RegistrationForm />} />
     <Route path="/" element={<LoginForm />} />
 
-    {/* Protected Routes */}
     <Route
       element={
         <ProtectedRoute>
@@ -31,10 +32,15 @@ function App() {
       <Route path="/studentdetails" element={<StudentDetail />} />
       <Route path="/addstudent" element={<StudentRegistrationForm />} />
       <Route path="/feestracker" element={<FeesTracker />} />
+
+
+
     </Route>
 
-    {/* Default Redirect */}
-    {/* <Route path="*" element={<LoginForm />} /> */}
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
+<Route path="/ResetPassword" element={<ResetPassword />} />
+
 
   </Routes>
 </BrowserRouter>

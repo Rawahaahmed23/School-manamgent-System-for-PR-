@@ -169,37 +169,73 @@ res.status(200).json({message:"otp send sucessfuly"})
    }
 }
 
+
+// Verify OTP
+const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
+
+  try {
+    const user = await Admin.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.resetOtp === '' || user.resetOtp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (user.resetOtpExpire < Date.now()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    return res.status(200).json({ message: "OTP verified successfully" });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+
 // Forgot passowrd 
+const ResetPassword = async(req, res) => {
+  const { email, otp, newpassword } = req.body;
 
-const ResetPassword = async(req,res)=>{
-const {email,otp,newpassword}=req.body
-if(!email||!newpassword ||!otp){
-    return res.status(400).json({message: 'Email,OTP,New password are requried'})
-}
-try{
-  const user = await Admin.findOne({email})
-  if(!user){
-    return res.status(400).json({message:"User not found"})
+  if (!email || !newpassword || !otp) {
+    return res.status(400).json({ message: 'Email, OTP, New password are required' });
   }
-  if(user.resetOtp ===''|| user.resetOtp!==otp){
-    return res.status(400).json({message:"invalid OTP"})
-  }
-  if(user.resetOtpExpire < Date.now()){
-    return res.status(400).json({message:"OTP expired"})
-  }
-  const hashpassword = await bcrypt.hash(newpassword,10)
-  user.password =hashpassword
-  user.resetOtp= ''
-  user.resetOtpExpire = 0
-  await user.save()
- return res.status(200).json({message: "Password Change Succesfully"})
 
-  
-}catch(error){
- console.log(error);
- 
-}
-}
+  try {
+    const user = await Admin.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.resetOtp === '' || user.resetOtp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (user.resetOtpExpire < Date.now()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    // ✅ Plain text do — hook khud hash karega
+    user.password = newpassword;
+    user.resetOtp = '';
+    user.resetOtpExpire = 0;
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
 
 const user = async (req, res) => {
   try {
@@ -219,4 +255,4 @@ const user = async (req, res) => {
 
 
 
-module.exports ={Singup,Login,Logout,sendOtp,ResetPassword,user}
+module.exports ={Singup,Login,Logout,sendOtp,ResetPassword,user,verifyOtp}

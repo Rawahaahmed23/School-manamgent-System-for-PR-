@@ -32,24 +32,23 @@ const AdminSchema = new mongoose.Schema({
 
 
 
-AdminSchema.pre('save',async function(next) {
-    try{
-        const admin =this
-        if(!admin.isModified('password')){
-            return 
+AdminSchema.pre('save', async function(next) {
+    try {
+        const admin = this;
+        if (!admin.isModified('password')) {
+            return next(); 
         }
 
-        const salt = await bcrypt.genSalt(10)
-        const hash =  await  bcrypt.hash(admin.password,salt)
-        admin.password =hash
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(admin.password, salt);
+        admin.password = hash;
+        return next(); 
 
-       
-    }catch(error){
-     console.log(error);
-     
+    } catch(error) {
+        console.log(error);
+        return next(error); 
     }
-    
-})
+});
 AdminSchema.methods.comparePassword = async function(password) {
   return bcrypt.compare(password, this.password);
 }
