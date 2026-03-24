@@ -4,9 +4,10 @@ const router = express.Router()
 
 
 
-router.route('/markpaid/:id').post(feesHandler.markpaid)
-router.route('/markUnpaid/:id').post(feesHandler.Unpaid)
+router.route('/markpaid/:id').put(feesHandler.markpaid)
+router.route('/markunpaid/:id').put(feesHandler.Unpaid)
 
 
 
-module.exports = router
+
+module.exports = router;

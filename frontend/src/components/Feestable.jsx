@@ -1,172 +1,379 @@
 "use client";
 
-import React from "react";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import React, { useState } from "react";
+import { Badge } from "../components/ui/badge";
+import { TrendingUp, TrendingDown, ChevronLeft, ChevronRight, Receipt } from "lucide-react";
 
 
-const Badge = ({ status }) => {
-  if (status === "Paid") {
-    return (
-      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
-        Paid
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
-       Unpaid
-    </span>
-  );
-};
+
+const SkeletonRow = ({ cols }) => (
+  <tr>
+    {Array.from({ length: cols }).map((_, i) => (
+      <td key={i} className="px-4 py-3">
+        <div className="h-4 bg-gray-100 rounded-md animate-pulse" style={{ width: i === 0 ? "24px" : i === 1 ? "120px" : "70px" }} />
+      </td>
+    ))}
+  </tr>
+);
+
+const ROWS_PER_PAGE = 8;
 
 export const StudentTable = ({
   students,
   onMarkPaid,
   onMarkUnpaid,
+  onGenerateVoucher,
   loading = false,
 }) => {
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">Loading students...</p>
-        </div>
-      </div>
-    );
-  }
+  const [page, setPage] = useState(1);
 
-  if (!students || students.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <p className="text-gray-400 text-lg font-medium">No students found</p>
-          <p className="text-gray-400 text-sm">
-            Try adjusting your filters or search
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const totalStudents = students?.length ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalStudents / ROWS_PER_PAGE));
+
+  const paginated = (students ?? []).slice(
+    (page - 1) * ROWS_PER_PAGE,
+    page * ROWS_PER_PAGE
+  );
+
+  const startEntry = totalStudents === 0 ? 0 : (page - 1) * ROWS_PER_PAGE + 1;
+  const endEntry = Math.min(page * ROWS_PER_PAGE, totalStudents);
 
   return (
-    <>
-      {/* DESKTOP (lg+) */}
-      <div className="hidden lg:block overflow-x-auto rounded-xl border border-gray-100">
-        <table className="w-full text-sm">
+    <div className="flex flex-col">
+
+
+      <div className="hidden lg:block rounded-xl border border-gray-100 overflow-hidden">
+        <table className="w-full text-sm" style={{ borderCollapse: "collapse" }}>
           <thead>
             <tr className="border-b-2 border-gray-100 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              {["Student", "Roll", "Class", "Father", "Gender", "Status", "Actions"].map((h) => (
-                <th key={h} className="px-5 py-3 whitespace-nowrap">{h}</th>
-              ))}
+              <th className="px-4 py-3.5 w-10">#</th>
+              <th className="px-4 py-3.5 w-24">GR No</th>
+              <th className="px-4 py-3.5">Student Name</th>
+              <th className="px-4 py-3.5">Father Name</th>
+              <th className="px-4 py-3.5 w-20">Class</th>
+              <th className="px-4 py-3.5 w-20">Gender</th>
+              <th className="px-4 py-3.5 w-24">Status</th>
+              <th className="px-4 py-3.5 w-32">Next Due</th>
+              <th className="px-4 py-3.5 w-52">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
-            {students.map((student) => (
-              <tr key={student._id} className="hover:bg-blue-50/60 transition-colors">
-                <td className="px-5 py-4 font-semibold text-gray-800 whitespace-nowrap">{student.StudentName}</td>
-                <td className="px-5 py-4 text-gray-600">{student.GrNumber}</td>
-                <td className="px-5 py-4 text-gray-600">{student.Class}</td>
-                <td className="px-5 py-4 text-gray-600 whitespace-nowrap">{student.FatherName}</td>
-                <td className="px-5 py-4 text-gray-600">{student.Gender}</td>
-                <td className="px-5 py-4">
-                  <Badge status={student.FeeStatus || "Unpaid"} />
-                </td>
-                <td className="px-5 py-4">
-                  {(!student.FeeStatus || student.FeeStatus === "Unpaid") ? (
-                    <button onClick={() => onMarkPaid(student)} className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-green-200 transition-colors whitespace-nowrap">
-                      <TrendingUp size={14} /> Mark Paid
-                    </button>
-                  ) : (
-                    <button onClick={() => onMarkUnpaid(student)} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">
-                      <TrendingDown size={14} /> Edit Status
-                    </button>
-                  )}
+          <tbody>
+            {loading
+              ? Array.from({ length: ROWS_PER_PAGE }).map((_, i) => (
+                <SkeletonRow key={i} cols={9} />
+              ))
+              : paginated.map((student, idx) => (
+                <tr
+                  key={student._id}
+                  className="border-b border-gray-100 transition-colors hover:bg-blue-50/60"
+                >
+                  <td className="px-4 py-3 text-gray-300 text-xs font-bold">
+                    {(page - 1) * ROWS_PER_PAGE + idx + 1}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 font-mono text-xs">
+                    {student.GrNumber}
+                  </td>
+                  <td className="px-4 py-3 text-gray-800 font-semibold">
+                    {student.StudentName}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">{student.FatherName}</td>
+                  <td className="px-4 py-3 text-gray-600">{student.Class}</td>
+                  <td className="px-4 py-3 text-gray-600">{student.Gender}</td>
+                  <td className="px-4 py-3">
+                    <Badge
+                      className={
+                        student.feeStatus === "Paid"
+                          ? "bg-blue-700 text-white"
+                          : "bg-red-900 text-white"
+                      }
+                    >
+                      {student.feeStatus || "Unpaid"}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3">
+                    {student.nextDueDate ? (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-50 text-orange-600 border border-orange-100">
+                        {new Date(student.nextDueDate).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-300">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      {student.feeStatus !== "Paid" ? (
+                        <button
+                          onClick={() => onMarkPaid(student)}
+                          className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-green-200 transition-colors whitespace-nowrap"
+                        >
+                          <TrendingUp size={13} /> Mark Paid
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => onMarkUnpaid(student)}
+                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+                        >
+                          <TrendingDown size={13} /> Edit Status
+                        </button>
+                      )}
+                      <button
+                        onClick={() => onGenerateVoucher?.(student)}
+                        className="px-3 py-1.5 bg-violet-50 text-violet-700 border border-violet-200 rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-violet-100 transition-colors whitespace-nowrap"
+                      >
+                        <Receipt size={13} /> Voucher
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+            {/* Empty state */}
+            {!loading && paginated.length === 0 && (
+              <tr>
+                <td colSpan={9} className="px-4 py-10 text-center text-gray-400 text-sm">
+                  No students found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* TABLET (md–lg) */}
-      <div className="hidden md:block lg:hidden overflow-x-auto rounded-xl border border-gray-100">
-        <table className="w-full text-sm">
+      {/* ── TABLET (md–lg) ── */}
+      <div className="hidden md:block lg:hidden rounded-xl border border-gray-100 overflow-hidden">
+        <table className="w-full text-sm" style={{ borderCollapse: "collapse" }}>
           <thead>
             <tr className="border-b-2 border-gray-100 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              {["Student", "Class", "Status", "Actions"].map((h) => (
-                <th key={h} className="px-4 py-3 whitespace-nowrap">{h}</th>
-              ))}
+              <th className="px-4 py-3.5 w-10">#</th>
+              <th className="px-4 py-3.5">Student</th>
+              <th className="px-4 py-3.5 w-24">Class</th>
+              <th className="px-4 py-3.5 w-24">Status</th>
+              <th className="px-4 py-3.5 w-28">Next Due</th>
+              <th className="px-4 py-3.5 w-48">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
-            {students.map((student) => (
-              <tr key={student._id} className="hover:bg-blue-50/60 transition-colors">
-                <td className="px-4 py-3">
-                  <p className="font-semibold text-gray-800 whitespace-nowrap">{student.StudentName}</p>
-                  <p className="text-xs text-gray-400">{student.GrNumber} · {student.FatherName}</p>
-                </td>
-                <td className="px-4 py-3">
-                  <p className="text-gray-700">{student.Class}</p>
-                  <p className="text-xs text-gray-400">{student.Gender}</p>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge status={student.FeeStatus || "Unpaid"} />
-                </td>
-                <td className="px-4 py-3">
-                  {(!student.FeeStatus || student.FeeStatus === "Unpaid") ? (
-                    <button onClick={() => onMarkPaid(student)} className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-green-200 transition-colors whitespace-nowrap">
-                      <TrendingUp size={14} /> Mark Paid
-                    </button>
-                  ) : (
-                    <button onClick={() => onMarkUnpaid(student)} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">
-                      <TrendingDown size={14} /> Edit Status
-                    </button>
-                  )}
+          <tbody>
+            {loading
+              ? Array.from({ length: ROWS_PER_PAGE }).map((_, i) => (
+                <SkeletonRow key={i} cols={6} />
+              ))
+              : paginated.map((student, idx) => (
+                <tr
+                  key={student._id}
+                  className="border-b border-gray-100 transition-colors hover:bg-blue-50/60"
+                >
+                  <td className="px-4 py-3 text-gray-300 text-xs font-bold">
+                    {(page - 1) * ROWS_PER_PAGE + idx + 1}
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="font-semibold text-gray-800">{student.StudentName}</p>
+                    <p className="text-xs text-gray-400">
+                      GR {student.GrNumber} · {student.FatherName}
+                    </p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="text-gray-700">{student.Class}</p>
+                    <p className="text-xs text-gray-400">{student.Gender}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                     <Badge
+                      className={
+                        student.feeStatus === "Paid"
+                          ? "bg-blue-700 text-white"
+                          : "bg-red-900 text-white"
+                      }
+                    >
+                      {student.feeStatus || "Unpaid"}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3">
+                    {student.nextDueDate ? (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-50 text-orange-600 border border-orange-100">
+                        {new Date(student.nextDueDate).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-300">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      {student.feeStatus !== "Paid" ? (
+                        <button
+                          onClick={() => onMarkPaid(student)}
+                          className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-green-200 transition-colors whitespace-nowrap"
+                        >
+                          <TrendingUp size={13} /> Mark Paid
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => onMarkUnpaid(student)}
+                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+                        >
+                          <TrendingDown size={13} /> Edit Status
+                        </button>
+                      )}
+                      <button
+                        onClick={() => onGenerateVoucher?.(student)}
+                        className="px-3 py-1.5 bg-violet-50 text-violet-700 border border-violet-200 rounded-lg flex items-center gap-1 text-xs font-medium hover:bg-violet-100 transition-colors whitespace-nowrap"
+                      >
+                        <Receipt size={13} /> Voucher
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+            {!loading && paginated.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-4 py-10 text-center text-gray-400 text-sm">
+                  No students found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* MOBILE (<md) */}
+      {/* ── MOBILE (<md) ── */}
       <div className="md:hidden space-y-3 px-1">
-        {students.map((student) => (
-          <div key={student._id} className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
-            <div className="flex items-start justify-between gap-2 mb-3">
-              <div>
-                <h3 className="font-bold text-gray-900 text-base leading-tight">{student.StudentName}</h3>
-                <p className="text-xs text-gray-400 mt-0.5">Roll {student.GrNumber} · Class {student.Class}</p>
-              </div>
-              <Badge status={student.FeeStatus || "Unpaid"} />
+        {loading
+          ? Array.from({ length: ROWS_PER_PAGE }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl p-4 border border-gray-200 animate-pulse">
+              <div className="h-4 bg-gray-100 rounded w-2/3 mb-2" />
+              <div className="h-3 bg-gray-100 rounded w-1/3" />
             </div>
+          ))
+          : paginated.length === 0
+            ? (
+              <div className="text-center py-10 text-gray-400 text-sm">No students found.</div>
+            )
+            : paginated.map((student, idx) => (
+              <div
+                key={student._id}
+                className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-300 w-5">
+                      {(page - 1) * ROWS_PER_PAGE + idx + 1}
+                    </span>
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-base leading-tight">
+                        {student.StudentName}
+                      </h3>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        GR {student.GrNumber} · Class {student.Class}
+                      </p>
+                    </div>
+                  </div>
+                     <Badge
+                      className={
+                        student.feeStatus === "Paid"
+                          ? "bg-blue-700 text-white"
+                          : "bg-red-900 text-white"
+                      }
+                    >
+                      {student.feeStatus || "Unpaid"}
+                    </Badge>
+                </div>
 
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm mb-3">
-              <div>
-                <span className="text-gray-400 text-xs">Father</span>
-                <p className="text-gray-700 font-medium truncate">{student.FatherName}</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-xs">Gender</span>
-                <p className="text-gray-700 font-medium">{student.Gender}</p>
-              </div>
-            </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm mb-3">
+                  <div>
+                    <span className="text-gray-400 text-xs">Father</span>
+                    <p className="text-gray-700 font-medium truncate">{student.FatherName}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 text-xs">Gender</span>
+                    <p className="text-gray-700 font-medium">{student.Gender}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 text-xs">Next Due</span>
+                    <p className="text-orange-500 font-medium text-xs p-0">
+                      {student.nextDueDate
+                        ? new Date(student.nextDueDate).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
 
-            <div className="flex items-center justify-end border-t border-gray-100 pt-3">
-              {(!student.FeeStatus || student.FeeStatus === "Unpaid") ? (
-                <button onClick={() => onMarkPaid(student)} className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg flex items-center gap-1 text-xs font-semibold hover:bg-green-200 transition-colors">
-                  <TrendingUp size={14} /> Mark Paid
-                </button>
-              ) : (
-                <button onClick={() => onMarkUnpaid(student)} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg flex items-center gap-1 text-xs font-semibold hover:bg-blue-700 transition-colors">
-                  <TrendingDown size={14} /> Edit Status
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
+                <div className="flex items-center justify-end gap-2 border-t border-gray-100 pt-3">
+                  {student.feeStatus !== "Paid" ? (
+                    <button
+                      onClick={() => onMarkPaid(student)}
+                      className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg flex items-center gap-1 text-xs font-semibold hover:bg-green-200 transition-colors"
+                    >
+                      <TrendingUp size={13} /> Mark Paid
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onMarkUnpaid(student)}
+                      className="px-3 py-1.5 bg-blue-600 text-white rounded-lg flex items-center gap-1 text-xs font-semibold hover:bg-blue-700 transition-colors"
+                    >
+                      <TrendingDown size={13} /> Edit Status
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onGenerateVoucher?.(student)}
+                    className="px-3 py-1.5 bg-violet-50 text-violet-700 border border-violet-200 rounded-lg flex items-center gap-1 text-xs font-semibold hover:bg-violet-100 transition-colors"
+                  >
+                    <Receipt size={13} /> Voucher
+                  </button>
+                </div>
+              </div>
+            ))}
       </div>
-    </>
+
+      {/* ── PAGINATION ── */}
+      <div className="flex items-center justify-between mt-4 px-1">
+        <p className="text-xs text-gray-400 font-medium">
+          {totalStudents === 0
+            ? "No students"
+            : `Showing ${startEntry}–${endEntry} of ${totalStudents} students`}
+        </p>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft size={14} /> Previous
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors ${p === page
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "border border-gray-200 text-gray-500 hover:bg-gray-50"
+                }`}
+            >
+              {p}
+            </button>
+          ))}
+
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Next <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };

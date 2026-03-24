@@ -38,7 +38,7 @@ function TableControl({
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5">
+    <div className="max-w-7xl mx-auto space-y-5 my-6">
       <div>
         <h1 className="text-xl font-bold text-slate-800">Student Directory</h1>
         <p className="text-slate-400 text-sm">Manage and view all student records</p>

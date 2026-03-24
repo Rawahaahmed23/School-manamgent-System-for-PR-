@@ -26,14 +26,19 @@ export const StudentProvider = ({ children }) => {
       setLoading(false);
     }
   };
+useEffect(() => {
+  getStudents();
+}, []);
 
-
-  const markPaid = async (id, months) => {
+const markPaid = async (id, months, year) => {
   try {
     const res = await fetch(`http://localhost:5000/fee/markpaid/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ months }),
+          body: JSON.stringify({ 
+        months: Array.isArray(months) ? months : [months],  
+        year 
+      }),
     });
 
     const data = await res.json();
@@ -49,24 +54,29 @@ export const StudentProvider = ({ children }) => {
   }
 };
 
-const markUnpaid = async (id, months) => {
+const markUnpaid = async (id, months, year) => {
   try {
-    const res = await fetch(`http://localhost:5000/fee/markunpaid//${id}`, {
+    const res = await fetch(`http://localhost:5000/fee/markunpaid/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ months }),
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify({ 
+        months: Array.isArray(months) ? months : [months], 
+        year 
+      }),
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.message);
-      return;
+      return { success: false, message: data.message };
     }
 
     await getStudents();
+    return { success: true };
+
   } catch (err) {
     console.error(err);
+    return { success: false, message: "Something went wrong" };
   }
 };
 
@@ -115,7 +125,7 @@ const markUnpaid = async (id, months) => {
   }, []);
 
   return (
-    <StudentContext.Provider value={{ students, getStudents, editStudent, deleteStudent, loading, markPaid,markUnpaid }}>
+    <StudentContext.Provider value={{ students, getStudents, editStudent, deleteStudent, loading, markPaid,markUnpaid, }}>
       {children}
     </StudentContext.Provider>
   );

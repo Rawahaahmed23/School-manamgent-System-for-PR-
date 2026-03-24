@@ -8,7 +8,7 @@ import { Upload, User, X, Loader2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// ─── Full Page Loader ───────────────────────────────────────────────────────
+
 const FullPageLoader = () => (
   <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
     <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
@@ -16,7 +16,7 @@ const FullPageLoader = () => (
   </div>
 );
 
-// ─── Main Form ──────────────────────────────────────────────────────────────
+
 const StudentRegistrationForm = () => {
   const [formData, setFormData] = useState({
     GrNumber: "",
@@ -64,19 +64,17 @@ const StudentRegistrationForm = () => {
   };
 
   const handleSubmit = async () => {
-    // Basic validation
+ 
     if (!formData.GrNumber || !formData.StudentName) {
-      toast.error("GrNumber aur StudentName zaroori hain.");
+      toast.error("GrNumber aur StudentName Are required.");
       return;
     }
 
     setLoading(true);
     try {
-      // ✅ Sirf FormData banao — Cloudinary upload frontend se hata diya
-      // Backend khud image Cloudinary pe upload karega
+    
       const fd = new FormData();
 
-      // Text fields append karo
       fd.append("GrNumber", formData.GrNumber);
       fd.append("StudentName", formData.StudentName);
       fd.append("FatherName", formData.FatherName);
@@ -88,15 +86,15 @@ const StudentRegistrationForm = () => {
       fd.append("FeeStatus", formData.FeeStatus);
       fd.append("LastFeeUpdate", formData.LastFeeUpdate);
 
-      // Image file append karo (agar hai to)
+      
       if (formData.profileImage) {
         fd.append("profileImage", formData.profileImage);
       }
 
-      // ✅ Ek hi request — backend ko FormData bhejo
+
       const response = await fetch("http://localhost:5000/Student/add_Student", {
         method: "POST",
-        // ⚠️ Content-Type header mat lagao — browser khud multipart/form-data set karega
+     
         body: fd,
       });
 
@@ -130,12 +128,12 @@ const StudentRegistrationForm = () => {
         theme="light"
       />
 
-      {/* Full Page Loader */}
+   
       {loading && <FullPageLoader />}
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-3 sm:p-6 lg:p-8">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
+    
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
@@ -180,7 +178,7 @@ const StudentRegistrationForm = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Profile Picture */}
+              
                 <div className="lg:col-span-4">
                   <div className="flex flex-col items-center">
                     <div className="relative">
@@ -220,7 +218,6 @@ const StudentRegistrationForm = () => {
                   </div>
                 </div>
 
-                {/* Form Fields */}
                 <div className="lg:col-span-8">
                   <div className="space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">

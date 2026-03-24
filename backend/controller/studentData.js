@@ -36,7 +36,7 @@ const AddStudent = async (req, res) => {
       StudentName,
       FatherName,
       Class,
-      paidMonths: [],  // initially koi month paid nahi
+      paidMonths: [],  
       Gender,
       DateOfBirth: moment(DateOfBirth, 'YYYY-MM-DD').toDate(),
       DateOfAdmission: moment(DateOfAdmission, 'YYYY-MM-DD').toDate(),
@@ -136,10 +136,29 @@ const EditStudent = async (req, res) => {
 const getStudent = async (req, res) => {
   try {
     const students = await Student.find();  
+    const now = new Date();
+
+    const updatedStudents = students.map((student) => {
+ 
+
+      let feeStatus = student.feeStatus || "Unpaid";
+
+     
+      if (student.nextDueDate && now > new Date(student.nextDueDate)) {
+        feeStatus = "Unpaid";
+      }
+
+      return {
+        ...student._doc,
+        feeStatus
+      };
+    });
+
     res.status(200).json({
       success: true,
-      data: students
+      data: updatedStudents
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -147,7 +166,6 @@ const getStudent = async (req, res) => {
     });
   }
 };
-
 
 
 const generateStudentPDF = async (req, res) => {

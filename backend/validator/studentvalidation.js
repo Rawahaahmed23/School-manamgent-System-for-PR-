@@ -49,10 +49,6 @@ const studentValidationSchema = yup.object({
     .typeError("Monthly Fee must be a number")
     .required("Monthly Fee is required")
     .positive(),
-
-
-
-
 });
 
 module.exports = studentValidationSchema;

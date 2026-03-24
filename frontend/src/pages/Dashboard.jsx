@@ -6,6 +6,7 @@ import StudentOverview from "@/components/StudentOverview";
 import RecentActivity from "@/components/RecentActivity";
 import RecentStudents from "@/components/RecentStudent";
 import { useStudent } from "@/Store/StudentData";
+import { useStudentFilters } from "@/Hooks/filterStudent";
 
 const stats = {
   totalStudents: 520,
@@ -16,6 +17,7 @@ const stats = {
 
 const Dashboard = () => {
   const { students } = useStudent(); 
+    const { filteredStudents, classFilter, setClassFilter } = useStudentFilters(students);
 
   return (
     <div className="min-h-2xl">
@@ -69,7 +71,8 @@ const Dashboard = () => {
 
         {/* Bottom Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          <StudentOverview students={students ?? []} />
+      
+      <StudentOverview students={students} filteredStudents={filteredStudents} />
           <RecentStudents students={students ?? []} />
           <div className="md:col-span-2 xl:col-span-1">
             <RecentActivity />

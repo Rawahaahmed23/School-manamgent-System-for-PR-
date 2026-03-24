@@ -1,13 +1,14 @@
 import React from 'react';
 import { Users } from 'lucide-react';
 
-function StudentOverview({ students }) {
-  const boys = students.filter((s) => s.gender === "Boy").length;
-  const girls = students.filter((s) => s.gender === "Girl").length;
+function StudentOverview({ students, filteredStudents }) {
+  // filteredStudents ka use karo
+  const boys = filteredStudents.filter((s) => s.Gender === "Boy").length;
+  const girls = filteredStudents.filter((s) => s.Gender === "Girl").length;
 
   const classDistribution = {};
-  students.forEach((s) => {
-    classDistribution[s.class] = (classDistribution[s.class] || 0) + 1;
+  filteredStudents.forEach((s) => {
+    classDistribution[s.Class] = (classDistribution[s.Class] || 0) + 1;
   });
 
   return (
@@ -26,25 +27,19 @@ function StudentOverview({ students }) {
         <div className="bg-blue-100 rounded-xl p-4 sm:p-5 border border-blue-100">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs sm:text-sm text-slate-600 font-semibold uppercase">Boys</p>
-           
           </div>
           <h3 className="text-3xl sm:text-4xl font-bold text-blue-600">
             {boys}
           </h3>
-         
         </div>
-
-
 
         <div className="bg-blue-100 rounded-xl p-4 sm:p-5 border border-pink-100">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs sm:text-sm text-slate-600 font-semibold uppercase">Girls</p>
-         
           </div>
           <h3 className="text-3xl sm:text-4xl font-bold text-blue-600">
             {girls}
           </h3>
-         
         </div>
       </div>
 
@@ -66,7 +61,7 @@ function StudentOverview({ students }) {
                 <div className="hidden sm:block w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-blue-500 rounded-full"
-                    style={{ width: `${(count / students.length) * 100}%` }}
+                    style={{ width: `${(count / filteredStudents.length) * 100}%` }}
                   ></div>
                 </div>
                 <span className="bg-blue-600 text-white text-xs sm:text-sm font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg min-w-[3rem] text-center">

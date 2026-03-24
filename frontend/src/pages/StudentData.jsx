@@ -15,7 +15,7 @@ const StudentData = () => {
       class: student.Class,
       gender: student.Gender.toUpperCase(),
       monthlyFee: student.MonthlyFee,
-      feeStatus: student.FeeStatus,
+      feeStatus: student.feeStatus,
       dob: student.DateOfBirth,
       admissionDate: student.DateOfAdmission,
       profileImage: student.profileImage?.url || null,

@@ -3,8 +3,6 @@
 import React from "react";
 import { Search, Filter, X } from "lucide-react";
 
-
-
 export const SearchFilter = ({
   search,
   setSearch,
@@ -12,21 +10,26 @@ export const SearchFilter = ({
   setClassFilter,
   genderFilter,
   setGenderFilter,
+  feeFilter,
+  setFeeFilter,
 }) => {
-  const classes = ["8", "9", "10", "11", "12"];
+  const classes = Array.from({ length: 10 }, (_, i) => (i + 1).toString());
   const genders = ["Male", "Female"];
+  const feeStatus = ["Paid", "Unpaid"];
 
-  const hasActiveFilters = search || classFilter || genderFilter;
+  const hasActiveFilters =
+    search || classFilter || genderFilter || feeFilter;
 
   const clearFilters = () => {
     setSearch("");
     setClassFilter("");
     setGenderFilter("");
+    setFeeFilter("");
   };
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Search Input */}
         <div className="relative md:col-span-1">
           <Search
@@ -49,7 +52,7 @@ export const SearchFilter = ({
             className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
           />
           <select
-            value={classFilter}
+            value={classFilter || ""}
             onChange={(e) => setClassFilter(e.target.value)}
             className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all appearance-none bg-white"
           >
@@ -62,14 +65,14 @@ export const SearchFilter = ({
           </select>
         </div>
 
-   
+        {/* Gender Filter */}
         <div className="relative">
           <Filter
             size={20}
             className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
           />
           <select
-            value={genderFilter}
+            value={genderFilter || ""}
             onChange={(e) => setGenderFilter(e.target.value)}
             className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all appearance-none bg-white"
           >
@@ -81,9 +84,29 @@ export const SearchFilter = ({
             ))}
           </select>
         </div>
+
+        {/* Fee Status Filter */}
+        <div className="relative">
+          <Filter
+            size={20}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
+          <select
+            value={feeFilter || ""}
+            onChange={(e) => setFeeFilter(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all appearance-none bg-white"
+          >
+            <option value="">All Status</option>
+            {feeStatus.map((status) => (
+              <option key={status} value={status.toLowerCase()}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-
+      {/* Clear Filters Button */}
       {hasActiveFilters && (
         <div className="mt-4 flex justify-end">
           <button

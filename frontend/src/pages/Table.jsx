@@ -44,7 +44,7 @@ function Avatar({ firstName, lastName, profileImage, size = "md" }) {
   );
 }
 
-// ─────────────────────────────────────────────
+
 
 function StudentTable({ students = [] }) {
   const { deleteStudent } = useStudent();
@@ -61,7 +61,7 @@ function StudentTable({ students = [] }) {
     filteredStudents,
   } = useStudentFilters(students);
 
-  // Pagination
+
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(filteredStudents.length / ITEMS_PER_PAGE);
   const paginatedStudents = filteredStudents.slice(
@@ -69,7 +69,7 @@ function StudentTable({ students = [] }) {
     page * ITEMS_PER_PAGE
   );
 
-  // Delete popup
+
   const [popup, setPopup] = useState({
     open: false,
     studentId: null,
@@ -219,12 +219,12 @@ function StudentTable({ students = [] }) {
                     <TableCell className="py-3.5 text-center">
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
-                          student.FeeStatus === "Paid"
+                          student.feeStatus === "Paid"
                             ? "bg-green-100 text-green-600"
                             : "bg-red-100 text-red-600"
                         }`}
                       >
-                        {student.FeeStatus}
+                        {student.feeStatus}
                       </span>
                     </TableCell>
 

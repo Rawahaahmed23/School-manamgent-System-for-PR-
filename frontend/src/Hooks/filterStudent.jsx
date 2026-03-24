@@ -1,41 +1,33 @@
 import { useState, useMemo } from "react";
 
 export function useStudentFilters(students) {
-
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("");
   const [genderFilter, setGenderFilter] = useState("");
-  const [feeFilter, setFeeFilter] = useState("all"); // 🔥 NEW
+  const [feeFilter, setFeeFilter] = useState(""); // ✅ ADD: feeFilter state
 
   const filteredStudents = useMemo(() => {
     return students.filter((student) => {
+      const searchText = search.toLowerCase();
 
-      const unpaidMonths =
-        student.totalMonths.length - student.paidMonths.length;
-
-      // 🔍 Search
       const matchesSearch =
-        student.StudentName?.toLowerCase().includes(search.toLowerCase()) ||
-        student.FatherName?.toLowerCase().includes(search.toLowerCase());
+        student.StudentName?.toLowerCase().includes(searchText) ||
+        student.FatherName?.toLowerCase().includes(searchText);
 
-      // 🎓 Class
       const matchesClass = classFilter
         ? student.Class === classFilter
         : true;
 
-      // 🚻 Gender
       const matchesGender = genderFilter
         ? student.Gender === genderFilter
         : true;
 
-      // 💰 Fee Status (NEW)
-      const matchesFee =
-        feeFilter === "all" ||
-        (feeFilter === "paid" && unpaidMonths === 0) ||
-        (feeFilter === "unpaid" && unpaidMonths > 0);
+      // ✅ ADD: Fee filter logic
+      const matchesFee = feeFilter
+        ? student.feeStatus?.toLowerCase() === feeFilter.toLowerCase()
+        : true;
 
       return matchesSearch && matchesClass && matchesGender && matchesFee;
-
     });
   }, [students, search, classFilter, genderFilter, feeFilter]);
 
@@ -46,8 +38,8 @@ export function useStudentFilters(students) {
     setClassFilter,
     genderFilter,
     setGenderFilter,
-    feeFilter,          // 🔥 expose
-    setFeeFilter,       // 🔥 expose
-    filteredStudents
+    feeFilter,       // ✅ ADD
+    setFeeFilter,    // ✅ ADD
+    filteredStudents,
   };
 }
