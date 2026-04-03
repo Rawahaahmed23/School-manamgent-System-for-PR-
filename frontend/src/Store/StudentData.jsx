@@ -129,7 +129,7 @@ const markUnpaid = async (id, months, year) => {
   const deleteStudent = async (id) => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/Student/delete/${id}`, {
+      const res = await fetch(`https://student-manangment-system.onrender.com/Student/delete/${id}`, {
         method: "DELETE",
       });
       const result = await res.json();
