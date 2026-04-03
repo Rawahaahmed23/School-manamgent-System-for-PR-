@@ -32,8 +32,10 @@ const formData = {
      })
 
      const data = await response.json()
+     setloading(false)
+     Navigate('/')
  if(!response.ok){
-    toast.error(data.message || data.extraDetails); // ← error toast
+    toast.error(data.message || data.extraDetails); 
     setloading(false);
     return; 
 }

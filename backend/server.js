@@ -12,7 +12,8 @@ const feesVoucher = require('./routes/feesvoucherRoutes')
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://student-manangment-system.vercel.app"
+    "https://student-manangment-system.vercel.app",
+    "https://student-manangment-system-git-main-rawaha.vercel.app"
   ],
   credentials: true
 }));
