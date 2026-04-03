@@ -3,6 +3,7 @@ const Admin = require('../schema/AdminSchema')
 const transporter = require('../nodemailer/nodemailer')
 
 
+//  Singup 
 const Singup = async(req,res)=>{
  try{
    const{username,email,password} = req.body
@@ -28,13 +29,13 @@ const Singup = async(req,res)=>{
 
    }
  )
-const mailOption= {
-    from : process.env.Sender_Email,
-    to: email,
-    subject:'Welcome to the Software',
-    text: `Your account has been create with id: ${email}`
-}
-await transporter.sendMail(mailOption)
+// const mailOption= {
+//     from : process.env.Sender_Email,
+//     to: email,
+//     subject:'Welcome to the Software',
+//     text: `Your account has been create with id: ${email}`
+// }
+// await transporter.sendMail(mailOption)
 
  res.status(200).json({
     message:"registred Sucessful",

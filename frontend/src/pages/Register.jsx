@@ -39,8 +39,8 @@ const handleSubmit = async (e) => {
     const data = await response.json();
 
    if (response.ok) {
+     toast.success("Registration successful!");
   setloading(false);
-  toast.success("Registration successful!");
   Navigate('/');
 } else {
 
