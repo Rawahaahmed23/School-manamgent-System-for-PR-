@@ -4,53 +4,55 @@ const transporter = require('../nodemailer/nodemailer')
 
 
 //  Singup 
-const Singup = async(req,res)=>{
- try{
-   const{username,email,password} = req.body
-   const userExist = await Admin.findOne({
-    $or: [
-        { email },
-        { username }
-    ]
-});
+const Singup = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
 
- if (userExist) {
-    if (userExist.username === username) {
+    // Validation
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const userExist = await Admin.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (userExist) {
+      if (userExist.username === username) {
         return res.status(400).json({ message: "Username already exists" });
-    }
-    if (userExist.email === email) {
+      }
+      if (userExist.email === email) {
         return res.status(400).json({ message: "Email already exists" });
+      }
     }
-}
-   const create = await Admin.create({
-       username,
-       email,
-       password
 
-   }
- )
-const mailOption= {
-    from : process.env.Sender_Email,
-    to: email,
-    subject:'Welcome to the Software',
-    text: `Your account has been create with id: ${email}`
-}
-await transporter.sendMail(mailOption)
+    const create = await Admin.create({ username, email, password });
 
- res.status(200).json({
-    message:"registred Sucessful",
-    token: await create.generateToken(),
-    userid: create._id.toString()
- })
- 
+    // ✅ Don't let email failure crash the whole signup
+    try {
+      const mailOption = {
+        from: process.env.Sender_Email,
+        to: email,
+        subject: 'Welcome to the Software',
+        text: `Your account has been created with id: ${email}`
+      };
+      await transporter.sendMail(mailOption);
+    } catch (mailError) {
+      console.log("Email sending failed:", mailError.message); // log but don't crash
+    }
 
+    return res.status(200).json({
+      message: "Registered Successfully",
+      token: await create.generateToken(),
+      userid: create._id.toString()
+    });
 
- }catch(error){
-    console.log(error);
-    
- }
-}
-
+  } catch (error) {
+    console.log("Signup error:", error);
+    // ✅ Always send a response — this was your 401/no-response bug
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
 // Login 
 const Login = async (req, res) => {
   try {

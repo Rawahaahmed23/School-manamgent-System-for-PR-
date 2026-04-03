@@ -38,20 +38,26 @@ const handleSubmit = async (e) => {
 
     const data = await response.json();
 
-    if (response.ok) {
-      toast.success("Registration successful!");
-      Navigate('/');
-    } else {
-      toast.error(data.message || data.extraDetails);
-    }
+   if (response.ok) {
+  setloading(false);
+  toast.success("Registration successful!");
+  Navigate('/');
+} else {
+
+  console.log("Error response:", data);
+  
+  const errorMsg = data.message || data.extraDetails || data.error || "Signup failed. Please try again.";
+  toast.error(errorMsg);
+  setloading(false); // move this here too
+}
 
   } catch (error) {
-    // ✅ Fix 1: catch mein bhi error dikhao
+    
     console.log(error);
     toast.error("Network error. Please try again.");
 
   } finally {
-    setloading(false); // yeh already theek hai
+    setloading(false); 
   }
 };
 
