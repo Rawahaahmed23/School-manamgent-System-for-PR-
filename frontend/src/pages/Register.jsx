@@ -24,27 +24,22 @@ const formData = {
 };
  setloading(true);
     try{
-     const response = await fetch('https://student-management-system.onrender.com/signup',{
+     const response = await fetch('https://student-manangment-system.onrender.com/Signup',{
       method : "Post",
       credentials:'include',
       headers: {'Content-Type': 'application/json'},
        body: JSON.stringify(formData) 
      })
-
-  setloading(true);
-
-
-
-  const data = await response.json()
-
-  if(!response.ok){
-    toast.error(data.message || data.extraDetails)
-    return
-  }
-
-  toast.success("Registration successful!")
-  Navigate('/')
-
+     const data = await response.json()
+    if (response.ok) {
+  setloading(false);
+  Navigate('/');
+  toast.success("Registration successful!");
+} else {
+  toast.error(data.message || data.extraDetails);
+  setloading(false);
+  return;
+}
 
     }catch(error){
        console.log(error);
