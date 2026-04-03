@@ -29,13 +29,13 @@ const Singup = async(req,res)=>{
 
    }
  )
-// const mailOption= {
-//     from : process.env.Sender_Email,
-//     to: email,
-//     subject:'Welcome to the Software',
-//     text: `Your account has been create with id: ${email}`
-// }
-// await transporter.sendMail(mailOption)
+const mailOption= {
+    from : process.env.Sender_Email,
+    to: email,
+    subject:'Welcome to the Software',
+    text: `Your account has been create with id: ${email}`
+}
+await transporter.sendMail(mailOption)
 
  res.status(200).json({
     message:"registred Sucessful",
@@ -51,7 +51,7 @@ const Singup = async(req,res)=>{
  }
 }
 
-// Login 
+
 const Login = async (req, res) => {
   try {
     const { username, password, rememberMe } = req.body;
@@ -111,7 +111,7 @@ const sendOtp = async(req,res)=>{
      const {email} = req.body
      const userid = await Admin.findOne({email})
      if(!userid){
-        res.status(400).json({message:"User does not exsist"})
+        return res.status(400).json({message:"User does not exsist"})
      }
  
 
@@ -163,9 +163,10 @@ await transporter.sendMail({
     </div>
   `
 });
+
 res.status(200).json({message:"otp send sucessfuly"})
 }catch(error){
-    console.log(error);
+    res.status(500).json({message:"OTP send failed"});
     
    }
 }
