@@ -125,9 +125,7 @@ await userid.save();
   from: process.env.Sender_Email,
   to: email,
   subject: "Password Reset OTP",
-   connectionTimeout: 10000,  
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+ 
   html: `
     <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
       <div style="max-width: 500px; margin: auto; background: #ffffff; padding: 30px; border-radius: 8px;">
