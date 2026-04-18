@@ -18,7 +18,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.options('*', cors()); 
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -27,7 +27,7 @@ app.use('/Student',StudentRoutes)
 app.use('/fee',feesHandler)
 app.use('/feesVoucher',feesVoucher)
 app.use(errormiddleware)
-const Port = process.env.PORT || 5000;
+const Port = process.env.PORT || 5001;
 
 connectDb().then(()=>{
     app.listen(Port,()=>{
