@@ -76,7 +76,7 @@ const EditStudent = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/Student/edit/${id}`,
+        `https://school-manamgent-system-for-pr.onrender.com/edit/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
