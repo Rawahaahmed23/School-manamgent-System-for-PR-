@@ -10,16 +10,17 @@ const StudentRoutes = require('./routes/StudentRoute')
 const feesHandler = require('./routes/feeroutes')
 const feesVoucher = require('./routes/feesvoucherRoutes')
 app.use(cors({
-origin: [
-  "http://localhost:5173",
-  "https://student-manangment-system.vercel.app",
-  "https://student-manangment-system-git-main-rawaha.vercel.app",
-  "https://school-manamgent-system-for-pr-one.vercel.app"
-],
+  origin: [
+    "http://localhost:5173",
+    "https://student-manangment-system.vercel.app",
+    "https://school-manamgent-system-for-pr-one.vercel.app"
+  ],
   credentials: true
 }));
 
+app.options('*', cors()); // ✅ add this
 
+it 
 app.use(express.json());
 app.use(cookieParser());
 app.use('/',authRoutes)
